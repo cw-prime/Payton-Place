@@ -1,0 +1,7 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for Payton Place Development",
+  "main": "index.ts",
+  "types": "index.ts"
+}

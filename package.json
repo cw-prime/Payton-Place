@@ -1,0 +1,28 @@
+{
+  "name": "payton-place-development",
+  "version": "1.0.0",
+  "description": "Full-stack real estate consulting web application",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspaces",
+    "backend": "npm run dev --workspace=backend",
+    "frontend": "npm run dev --workspace=frontend"
+  },
+  "keywords": [
+    "real-estate",
+    "consulting",
+    "renovation",
+    "development"
+  ],
+  "author": "Payton Place Development",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
