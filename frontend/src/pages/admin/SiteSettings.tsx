@@ -24,7 +24,7 @@ const SiteSettings = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [, setSettings] = useState<Settings | null>(null);
   const [formData, setFormData] = useState({
     heroMediaType: 'image' as 'image' | 'video',
     heroImageUrl: '',
