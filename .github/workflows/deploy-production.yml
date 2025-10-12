@@ -34,13 +34,13 @@ jobs:
             # Build Frontend
             echo "🔨 Building frontend..."
             cd frontend
-            npm install --production
-            npm run build
+            npm install
+            npm run build -- --mode production
 
             # Build Backend
             echo "🔨 Building backend..."
             cd ../backend
-            npm install --production
+            npm install
             npm run build
 
             # Restart PM2
