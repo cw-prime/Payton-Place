@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Use absolute path to uploads directory
-    const uploadsPath = path.join(process.cwd(), 'uploads');
+    // Use absolute path to uploads directory relative to this file
+    const uploadsPath = path.join(__dirname, '..', '..', 'uploads');
     cb(null, uploadsPath);
   },
   filename: (req, file, cb) => {
