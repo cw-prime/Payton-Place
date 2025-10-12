@@ -51,7 +51,7 @@ const About = () => {
         <div className="container-custom">
           <SectionHeading>About Us</SectionHeading>
           <p className="text-lg text-gray-600 max-w-4xl">
-            Payton Place Development is a premier real estate development company specializing in
+            Here at Payton Place Development is a premier real estate development company specializing in
             transforming properties to meet the evolving needs of our clients. With a rich history of
             successful projects, we bring expertise and innovation to both residential and commercial
             developments.
