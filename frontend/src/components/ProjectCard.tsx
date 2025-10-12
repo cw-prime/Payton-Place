@@ -7,11 +7,14 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_BASE_URL = API_URL.replace('/api', '');
+
   const getImageUrl = (imagePath: string) => {
     // If already a full URL (http/https), return as-is
     if (imagePath.startsWith('http')) return imagePath;
     // Otherwise, prepend API base URL
-    return `http://localhost:5000${imagePath}`;
+    return `${API_BASE_URL}${imagePath}`;
   };
 
   return (
