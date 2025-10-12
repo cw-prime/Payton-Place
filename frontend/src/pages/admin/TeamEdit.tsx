@@ -32,8 +32,8 @@ const TeamEdit = () => {
   const [newImage, setNewImage] = useState<File | null>(null);
   const [newImagePreview, setNewImagePreview] = useState<string>('');
 
-  const API_BASE_URL = 'http://localhost:5000';
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_BASE_URL = API_URL.replace('/api', '');
 
   const getImageUrl = (imagePath: string) => {
     if (imagePath.startsWith('http')) return imagePath;

@@ -23,7 +23,8 @@ const Home = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_BASE_URL = API_URL.replace('/api', '');
 
   const getMediaUrl = (url: string) => {
     if (url.startsWith('http')) return url;
@@ -36,7 +37,7 @@ const Home = () => {
         const [projectsData, servicesData, settingsData] = await Promise.all([
           getProjects(undefined, true), // Get featured projects
           getServices(),
-          fetch(`${API_BASE_URL}/api/settings`).then(res => res.json()),
+          fetch(`${API_URL}/settings`).then(res => res.json()),
         ]);
         setFeaturedProjects(projectsData.slice(0, 3));
         setServices(servicesData.slice(0, 6));
