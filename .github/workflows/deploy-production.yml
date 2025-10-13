@@ -43,6 +43,10 @@ jobs:
             npm install
             npm run build
 
+            # Seed Categories (if not already seeded)
+            echo "📦 Seeding categories..."
+            npx tsx src/scripts/seedCategories.ts || echo "⚠️ Category seeding skipped (may already exist)"
+
             # Restart PM2
             echo "🔄 Restarting backend with PM2..."
             cd ..

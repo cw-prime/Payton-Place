@@ -25,13 +25,18 @@ const seedCategories = async () => {
     await mongoose.connect(MONGODB_URI);
     console.log('📦 Connected to MongoDB');
 
-    // Clear existing categories
-    await Category.deleteMany({});
-    console.log('🗑️  Cleared existing categories');
+    // Check if categories already exist
+    const existingCount = await Category.countDocuments();
 
-    // Insert new categories
+    if (existingCount > 0) {
+      console.log(`✅ Categories already exist (${existingCount} found). Skipping seed.`);
+      await mongoose.disconnect();
+      return;
+    }
+
+    // Insert new categories only if none exist
     await Category.insertMany(categories);
-    console.log('✅ Seeded categories successfully');
+    console.log(`✅ Seeded ${categories.length} categories successfully`);
 
     // Disconnect
     await mongoose.disconnect();
