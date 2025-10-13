@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Plus, FileText, Users, Mail, LogOut, Shield, ExternalLink, Settings, Wrench, UserCircle } from 'lucide-react';
+import { Plus, FileText, Users, Mail, LogOut, Shield, ExternalLink, Settings, Wrench, UserCircle, ClipboardList } from 'lucide-react';
 import { getProjects } from '../../services/api';
 import type { Project } from '../../types';
 
@@ -190,6 +190,17 @@ const Dashboard = () => {
               <div>
                 <p className="font-medium">Manage Team</p>
                 <p className="text-sm text-gray-600">Add or edit team members</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/admin/service-requests"
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <ClipboardList className="w-6 h-6 text-gray-600" />
+              <div>
+                <p className="font-medium">Service Requests</p>
+                <p className="text-sm text-gray-600">View and manage service requests</p>
               </div>
             </Link>
           </div>

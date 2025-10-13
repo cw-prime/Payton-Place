@@ -14,6 +14,7 @@ import contactRoutes from './routes/contactRoutes';
 import quoteRoutes from './routes/quoteRoutes';
 import settingsRoutes from './routes/settingsRoutes';
 import categoryRoutes from './routes/categoryRoutes';
+import serviceRequestRoutes from './routes/serviceRequestRoutes';
 
 const app: Application = express();
 
@@ -43,6 +44,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/quote', quoteRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/service-requests', serviceRequestRoutes);
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -66,6 +68,7 @@ app.get('/', (req: Request, res: Response) => {
       contact: '/api/contact',
       quote: '/api/quote',
       categories: '/api/categories',
+      serviceRequests: '/api/service-requests',
       health: '/api/health',
     },
   });

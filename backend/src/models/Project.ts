@@ -20,6 +20,11 @@ export interface IProject extends Document {
     role: string;
   };
   tags: string[];
+  beforeAfterGallery?: Array<{
+    beforeImage: string;
+    afterImage: string;
+    description?: string;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,6 +69,11 @@ const ProjectSchema = new Schema<IProject>(
       role: String,
     },
     tags: [String],
+    beforeAfterGallery: [{
+      beforeImage: String,
+      afterImage: String,
+      description: String,
+    }],
   },
   {
     timestamps: true,

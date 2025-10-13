@@ -30,6 +30,11 @@ export interface Project {
     role: string;
   };
   tags: string[];
+  beforeAfterGallery?: Array<{
+    beforeImage: string;
+    afterImage: string;
+    description?: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -78,4 +83,20 @@ export interface QuoteForm {
   description: string;
   budgetRange: string;
   timeline: string;
+}
+
+export interface ServiceRequestForm {
+  name: string;
+  email: string;
+  phone: string;
+  serviceId: string;
+  message: string;
+  preferredContactMethod: 'email' | 'phone' | 'either';
+}
+
+export interface ServiceRequest extends ServiceRequestForm {
+  _id: string;
+  status: 'new' | 'contacted' | 'in-progress' | 'completed' | 'declined';
+  createdAt: string;
+  updatedAt: string;
 }

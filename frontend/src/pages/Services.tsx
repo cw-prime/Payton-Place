@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 import ServiceCard from '../components/ServiceCard';
 import SectionHeading from '../components/SectionHeading';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { getServices } from '../services/api';
+import { ArrowRight } from 'lucide-react';
 import type { Service } from '../types';
 
 const Services = () => {
@@ -55,7 +57,7 @@ const Services = () => {
               </div>
 
               {/* Commercial Services */}
-              <div>
+              <div className="mb-16">
                 <h3 className="text-3xl font-bold mb-8">Commercial Services</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {commercialServices.map((service, index) => (
@@ -65,6 +67,25 @@ const Services = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Call to Action */}
+              <AnimatedSection className="mt-12">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 md:p-12 text-center text-white">
+                  <h3 className="text-3xl font-bold mb-4">
+                    Interested in One of Our Services?
+                  </h3>
+                  <p className="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">
+                    Request a specific service and we'll get back to you with a customized quote and timeline for your project.
+                  </p>
+                  <Link
+                    to="/service-request"
+                    className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    Request a Service
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </div>
+              </AnimatedSection>
             </>
           )}
         </div>
