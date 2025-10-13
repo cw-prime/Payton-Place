@@ -182,7 +182,7 @@ const ProjectDetail = () => {
                     {project.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
+                        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-full shadow-sm hover:shadow-md transition-shadow"
                       >
                         {tag}
                       </span>
