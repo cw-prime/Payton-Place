@@ -44,6 +44,16 @@ const Footer = () => {
         <p className="text-center text-gray-600 text-sm">
           &copy;{currentYear} Payton Place Development. All rights reserved.
         </p>
+
+        {/* Admin Login Link - Small and discreet */}
+        <div className="text-center mt-4">
+          <Link
+            to="/admin/login"
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            Admin
+          </Link>
+        </div>
       </div>
     </footer>
   );

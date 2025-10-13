@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IService extends Document {
   name: string;
   description: string;
-  category: 'residential' | 'commercial';
+  category: string;
   icon: string;
   image?: string;
   features?: string[];
@@ -24,7 +24,6 @@ const ServiceSchema = new Schema<IService>(
     },
     category: {
       type: String,
-      enum: ['residential', 'commercial'],
       required: true,
     },
     icon: {

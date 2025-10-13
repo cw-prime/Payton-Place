@@ -1,8 +1,19 @@
+export interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  type: 'project' | 'service';
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Project {
   _id: string;
   title: string;
   description: string;
-  category: 'residential' | 'commercial';
+  category: string;
   type: string;
   images: string[];
   featured: boolean;
@@ -27,7 +38,7 @@ export interface Service {
   _id: string;
   name: string;
   description: string;
-  category: 'residential' | 'commercial';
+  category: string;
   icon: string;
   image?: string;
   features?: string[];

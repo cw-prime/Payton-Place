@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ArrowLeft, Upload, X } from 'lucide-react';
@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import TextArea from '../../components/TextArea';
 import Select from '../../components/Select';
+import type { Category } from '../../types';
 
 const ProjectNew = () => {
   const { token, logout } = useAuth();
@@ -13,11 +14,12 @@ const ProjectNew = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'residential',
+    category: '',
     type: '',
     location: '',
     duration: '',
@@ -48,6 +50,27 @@ const ProjectNew = () => {
     setImages(prev => prev.filter((_, i) => i !== index));
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_URL}/categories?type=project&active=true`);
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+          // Set first category as default if available
+          if (data.length > 0 && !formData.category) {
+            setFormData(prev => ({ ...prev, category: data[0].slug }));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,10 +121,10 @@ const ProjectNew = () => {
     }
   };
 
-  const categoryOptions = [
-    { value: 'residential', label: 'Residential' },
-    { value: 'commercial', label: 'Commercial' },
-  ];
+  const categoryOptions = categories.map(cat => ({
+    value: cat.slug,
+    label: cat.name,
+  }));
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -211,7 +234,7 @@ const ProjectNew = () => {
             <Select
               label="Category *"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as 'residential' | 'commercial' })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               options={categoryOptions}
               required
             />

@@ -8,7 +8,7 @@ import TextArea from '../../components/TextArea';
 import Select from '../../components/Select';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getProjectById } from '../../services/api';
-import type { Project } from '../../types';
+import type { Project, Category } from '../../types';
 
 const ProjectEdit = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,12 +18,13 @@ const ProjectEdit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [project, setProject] = useState<Project | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'residential' as 'residential' | 'commercial',
+    category: '',
     type: '',
     location: '',
     duration: '',
@@ -47,7 +48,20 @@ const ProjectEdit = () => {
 
   useEffect(() => {
     fetchProject();
+    fetchCategories();
   }, [id]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories?type=project&active=true`);
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProject = async () => {
     try {
@@ -185,10 +199,10 @@ const ProjectEdit = () => {
     }
   };
 
-  const categoryOptions = [
-    { value: 'residential', label: 'Residential' },
-    { value: 'commercial', label: 'Commercial' },
-  ];
+  const categoryOptions = categories.map(cat => ({
+    value: cat.slug,
+    label: cat.name,
+  }));
 
   if (loading) {
     return (
@@ -393,7 +407,7 @@ const ProjectEdit = () => {
             <Select
               label="Category *"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as 'residential' | 'commercial' })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               options={categoryOptions}
               required
             />
