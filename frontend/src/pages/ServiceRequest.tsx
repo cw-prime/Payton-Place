@@ -11,7 +11,7 @@ import TextArea from '../components/TextArea';
 import Select from '../components/Select';
 import Button from '../components/Button';
 import { getServices } from '../services/api';
-import type { Service, ServiceRequestForm } from '../types';
+import type { Service } from '../types';
 
 const serviceRequestSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
