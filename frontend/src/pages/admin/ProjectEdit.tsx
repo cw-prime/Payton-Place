@@ -199,10 +199,12 @@ const ProjectEdit = () => {
     }
   };
 
-  const categoryOptions = categories.map(cat => ({
-    value: cat.slug,
-    label: cat.name,
-  }));
+  const categoryOptions = categories.length > 0
+    ? categories.map(cat => ({
+        value: cat.slug,
+        label: cat.name,
+      }))
+    : [{ value: '', label: 'Loading categories...' }];
 
   if (loading) {
     return (
