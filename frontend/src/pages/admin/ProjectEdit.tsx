@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import TextArea from '../../components/TextArea';
 import Select from '../../components/Select';
+import TagsInput from '../../components/TagsInput';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getProjectById } from '../../services/api';
 import type { Project, Category } from '../../types';
@@ -35,6 +36,7 @@ const ProjectEdit = () => {
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
   const API_BASE_URL = API_URL.replace('/api', '');
@@ -78,6 +80,7 @@ const ProjectEdit = () => {
         budget: data.details?.budget || '',
         featured: data.featured,
       });
+      setTags(data.tags || []);
     } catch (error) {
       console.error('Error fetching project:', error);
       setError('Failed to load project');
@@ -164,6 +167,11 @@ const ProjectEdit = () => {
       if (formData.location) formDataToSend.append('details[location]', formData.location);
       if (formData.duration) formDataToSend.append('details[duration]', formData.duration);
       if (formData.budget) formDataToSend.append('details[budget]', formData.budget);
+
+      // Add tags
+      tags.forEach((tag) => {
+        formDataToSend.append('tags', tag);
+      });
 
       // Send existing images (that weren't marked for deletion)
       existingImages.forEach((imageUrl) => {
@@ -437,6 +445,13 @@ const ProjectEdit = () => {
               label="Budget Range"
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+            />
+
+            <TagsInput
+              label="Tags"
+              value={tags}
+              onChange={setTags}
+              placeholder="e.g., renovation, modern, luxury"
             />
 
             <div className="flex items-center gap-2">

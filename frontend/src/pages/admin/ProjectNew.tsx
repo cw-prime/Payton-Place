@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import TextArea from '../../components/TextArea';
 import Select from '../../components/Select';
+import TagsInput from '../../components/TagsInput';
 import type { Category } from '../../types';
 
 const ProjectNew = () => {
@@ -29,6 +30,7 @@ const ProjectNew = () => {
 
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -91,6 +93,11 @@ const ProjectNew = () => {
       if (formData.location) formDataToSend.append('details[location]', formData.location);
       if (formData.duration) formDataToSend.append('details[duration]', formData.duration);
       if (formData.budget) formDataToSend.append('details[budget]', formData.budget);
+
+      // Add tags
+      tags.forEach((tag) => {
+        formDataToSend.append('tags', tag);
+      });
 
       // Add images
       images.forEach((image) => {
@@ -268,6 +275,13 @@ const ProjectNew = () => {
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
               placeholder="e.g., $50,000 - $75,000"
+            />
+
+            <TagsInput
+              label="Tags"
+              value={tags}
+              onChange={setTags}
+              placeholder="e.g., renovation, modern, luxury"
             />
 
             <div className="flex items-center gap-2">
