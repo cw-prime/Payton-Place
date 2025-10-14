@@ -11,7 +11,7 @@ const Turnstile = ({ onVerify, onError }: TurnstileProps) => {
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-  // Timeout fallback: if Turnstile doesn't load in 10 seconds, allow submission
+  // Timeout fallback: if Turnstile doesn't load in 3 seconds, allow submission
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!hasVerified) {
@@ -19,7 +19,7 @@ const Turnstile = ({ onVerify, onError }: TurnstileProps) => {
         setHasVerified(true);
         onVerify('timeout-fallback-token');
       }
-    }, 10000);
+    }, 3000); // Reduced from 10 seconds to 3 seconds
 
     return () => clearTimeout(timeout);
   }, [onVerify, hasVerified]);
