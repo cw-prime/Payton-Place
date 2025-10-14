@@ -8,8 +8,8 @@ import Input from '../components/Input';
 import TextArea from '../components/TextArea';
 import Select from '../components/Select';
 import Button from '../components/Button';
+import Turnstile from '../components/Turnstile';
 import { submitQuoteRequest } from '../services/api';
-import type { QuoteForm } from '../types';
 
 const quoteSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -29,6 +29,7 @@ const Quote = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [selectedProjectType, setSelectedProjectType] = useState<string>('');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   const {
     register,
@@ -41,13 +42,20 @@ const Quote = () => {
   });
 
   const onSubmit = async (data: QuoteFormData) => {
+    if (!turnstileToken) {
+      setSubmitStatus('error');
+      console.error('Turnstile verification required');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setSubmitStatus('idle');
-      await submitQuoteRequest(data as QuoteForm);
+      await submitQuoteRequest({ ...data, turnstileToken } as any);
       setSubmitStatus('success');
       reset();
       setSelectedProjectType('');
+      setTurnstileToken('');
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       setSubmitStatus('error');
@@ -181,9 +189,14 @@ const Quote = () => {
               error={errors.timeline?.message}
             />
 
+            <Turnstile
+              onVerify={setTurnstileToken}
+              onError={() => setTurnstileToken('')}
+            />
+
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !turnstileToken}
               fullWidth
               className="!py-4"
             >

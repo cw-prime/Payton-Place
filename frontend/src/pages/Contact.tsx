@@ -9,8 +9,8 @@ import Input from '../components/Input';
 import TextArea from '../components/TextArea';
 import Select from '../components/Select';
 import Button from '../components/Button';
+import Turnstile from '../components/Turnstile';
 import { submitContactForm } from '../services/api';
-import type { ContactForm } from '../types';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -24,6 +24,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   const {
     register,
@@ -35,12 +36,19 @@ const Contact = () => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
+    if (!turnstileToken) {
+      setSubmitStatus('error');
+      console.error('Turnstile verification required');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setSubmitStatus('idle');
-      await submitContactForm(data as ContactForm);
+      await submitContactForm({ ...data, turnstileToken } as any);
       setSubmitStatus('success');
       reset();
+      setTurnstileToken('');
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       setSubmitStatus('error');
@@ -94,9 +102,14 @@ const Contact = () => {
               error={errors.projectType?.message}
             />
 
+            <Turnstile
+              onVerify={setTurnstileToken}
+              onError={() => setTurnstileToken('')}
+            />
+
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !turnstileToken}
               fullWidth
               className="!py-4"
             >

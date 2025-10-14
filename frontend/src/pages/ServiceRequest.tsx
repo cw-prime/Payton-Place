@@ -10,6 +10,7 @@ import Input from '../components/Input';
 import TextArea from '../components/TextArea';
 import Select from '../components/Select';
 import Button from '../components/Button';
+import Turnstile from '../components/Turnstile';
 import { getServices } from '../services/api';
 import type { Service } from '../types';
 
@@ -29,6 +30,7 @@ const ServiceRequest = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   const {
     register,
@@ -63,6 +65,12 @@ const ServiceRequest = () => {
   }, [searchParams, setValue]);
 
   const onSubmit = async (data: ServiceRequestFormData) => {
+    if (!turnstileToken) {
+      setSubmitStatus('error');
+      console.error('Turnstile verification required');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setSubmitStatus('idle');
@@ -74,15 +82,17 @@ const ServiceRequest = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, turnstileToken }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit service request');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit service request');
       }
 
       setSubmitStatus('success');
       reset();
+      setTurnstileToken('');
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       setSubmitStatus('error');
@@ -171,9 +181,14 @@ const ServiceRequest = () => {
               error={errors.preferredContactMethod?.message}
             />
 
+            <Turnstile
+              onVerify={setTurnstileToken}
+              onError={() => setTurnstileToken('')}
+            />
+
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !turnstileToken}
               fullWidth
             >
               {isSubmitting ? 'Submitting...' : 'Submit Service Request'}

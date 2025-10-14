@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import ServiceRequest from '../models/ServiceRequest';
+import { sendServiceRequestNotification, verifyTurnstileToken } from '../services/emailService';
 
 export const getAllServiceRequests = async (req: Request, res: Response) => {
   try {
@@ -32,7 +33,13 @@ export const getServiceRequestById = async (req: Request, res: Response) => {
 
 export const createServiceRequest = async (req: Request, res: Response) => {
   try {
-    const { name, email, phone, serviceId, message, preferredContactMethod } = req.body;
+    const { name, email, phone, serviceId, message, preferredContactMethod, turnstileToken } = req.body;
+
+    // Verify Turnstile token
+    const isValidToken = await verifyTurnstileToken(turnstileToken);
+    if (!isValidToken) {
+      return res.status(400).json({ message: 'Bot verification failed. Please try again.' });
+    }
 
     const serviceRequest = new ServiceRequest({
       name,
@@ -46,6 +53,20 @@ export const createServiceRequest = async (req: Request, res: Response) => {
     await serviceRequest.save();
 
     console.log('✅ Service request created:', serviceRequest.name);
+
+    // Send email notification (populate serviceId for email template)
+    try {
+      const populatedRequest = await ServiceRequest.findById(serviceRequest._id)
+        .populate('serviceId', 'name category');
+
+      if (populatedRequest) {
+        await sendServiceRequestNotification(populatedRequest as any);
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error('⚠️ Email notification failed, but request was saved:', emailError);
+    }
+
     res.status(201).json(serviceRequest);
   } catch (error) {
     console.error('❌ Error creating service request:', error);
