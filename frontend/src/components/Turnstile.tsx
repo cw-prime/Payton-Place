@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Turnstile as TurnstileWidget } from '@marsidev/react-turnstile';
 
 interface TurnstileProps {
@@ -7,18 +7,22 @@ interface TurnstileProps {
 }
 
 const Turnstile = ({ onVerify, onError }: TurnstileProps) => {
+  const [hasVerified, setHasVerified] = React.useState(false);
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   // Timeout fallback: if Turnstile doesn't load in 10 seconds, allow submission
   useEffect(() => {
     const timeout = setTimeout(() => {
-      console.warn('⚠️ Turnstile timeout - allowing form submission');
-      onVerify('timeout-fallback-token');
+      if (!hasVerified) {
+        console.warn('⚠️ Turnstile timeout - allowing form submission');
+        setHasVerified(true);
+        onVerify('timeout-fallback-token');
+      }
     }, 10000);
 
     return () => clearTimeout(timeout);
-  }, [onVerify]);
+  }, [onVerify, hasVerified]);
 
   // In development/localhost, auto-verify to bypass Cloudflare port restriction
   if (isLocalhost && import.meta.env.DEV) {
@@ -40,11 +44,16 @@ const Turnstile = ({ onVerify, onError }: TurnstileProps) => {
     return null;
   }
 
+  const handleSuccess = (token: string) => {
+    setHasVerified(true);
+    onVerify(token);
+  };
+
   return (
     <div className="flex justify-center my-4">
       <TurnstileWidget
         siteKey={siteKey}
-        onSuccess={onVerify}
+        onSuccess={handleSuccess}
         onError={(err) => {
           console.error('Turnstile error:', err);
           onError?.();
