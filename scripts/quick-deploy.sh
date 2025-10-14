@@ -22,22 +22,34 @@ chmod 755 "$BACKEND_DIR/uploads"
 echo "✅ Directories created"
 echo ""
 
-# Step 2: Install backend dependencies
-echo "📦 Installing backend dependencies..."
-cd "$BACKEND_DIR"
-npm install --production
-echo "✅ Backend dependencies installed"
-echo ""
-
-# Step 3: Copy environment files
+# Step 2: Copy environment files
 echo "⚙️  Copying environment files..."
 if [ -f "$BACKEND_DIR/.env.production" ]; then
     cp "$BACKEND_DIR/.env.production" "$BACKEND_DIR/.env"
-    echo "✅ Environment file copied"
+    echo "✅ Backend environment file copied"
 else
-    echo "❌ Error: .env.production not found!"
+    echo "❌ Error: Backend .env.production not found!"
     exit 1
 fi
+if [ -f "$FRONTEND_DIR/.env.production" ]; then
+    cp "$FRONTEND_DIR/.env.production" "$FRONTEND_DIR/.env"
+    echo "✅ Frontend environment file copied"
+else
+    echo "⚠️  Frontend .env.production not found, skipping..."
+fi
+echo ""
+
+# Step 3: Install and build
+echo "📦 Installing dependencies and building..."
+cd "$BACKEND_DIR"
+npm install
+npm run build
+echo "✅ Backend built"
+
+cd "$FRONTEND_DIR"
+npm install
+npm run build
+echo "✅ Frontend built"
 echo ""
 
 # Step 4: Configure nginx
