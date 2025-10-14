@@ -91,7 +91,7 @@ if pm2 status | grep -q "payton-place-backend.*online"; then
 else
     log_error "PM2 status check failed"
     log_warn "Attempting to view logs..."
-    pm2 logs payton-place-backend --lines 20 --nostream
+    pm2 logs payton-place-backend --lines 20 --err
     exit 1
 fi
 
@@ -109,7 +109,7 @@ echo "📅 Deployed: $(date)"
 echo "🌐 URL: https://payton-place.mbartonportfolio.space"
 echo "📦 Backup: $BACKUP_FILE"
 echo "🔄 PM2 Status:"
-pm2 status payton-place-backend --nostream
+pm2 status
 echo "=================================="
 echo ""
 log_info "To view logs: pm2 logs payton-place-backend"
