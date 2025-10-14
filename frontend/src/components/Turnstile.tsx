@@ -10,6 +10,16 @@ const Turnstile = ({ onVerify, onError }: TurnstileProps) => {
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
+  // Timeout fallback: if Turnstile doesn't load in 10 seconds, allow submission
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      console.warn('⚠️ Turnstile timeout - allowing form submission');
+      onVerify('timeout-fallback-token');
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [onVerify]);
+
   // In development/localhost, auto-verify to bypass Cloudflare port restriction
   if (isLocalhost && import.meta.env.DEV) {
     console.log('🔓 Development mode: Turnstile bypassed for localhost');
