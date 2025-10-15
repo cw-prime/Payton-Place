@@ -22,42 +22,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            echo "🚀 Starting deployment to production..."
-
-            # Navigate to project directory
+            echo "🚀 Starting automated deployment to production..."
             cd /opt/apps/payton-place
-
-            # Pull latest changes
-            echo "📥 Pulling latest code from main branch..."
-            git pull origin main
-
-            # Build Frontend
-            echo "🔨 Building frontend..."
-            cd frontend
-            npm install
-            npm run build -- --mode production
-
-            # Build Backend
-            echo "🔨 Building backend..."
-            cd ../backend
-            npm install
-            npm run build
-
-            # Seed Categories (if not already seeded)
-            echo "📦 Seeding categories..."
-            npx tsx src/scripts/seedCategories.ts || echo "⚠️ Category seeding skipped (may already exist)"
-
-            # Restart PM2
-            echo "🔄 Restarting backend with PM2..."
-            cd ..
-            pm2 restart payton-place-backend
-
-            # Check PM2 status
-            echo "✅ Checking PM2 status..."
-            pm2 status
-
-            echo "🎉 Deployment to production complete!"
-            echo "🌐 Site: https://payton-place.mbartonportfolio.space"
+            bash scripts/deploy-remote.sh
 
       - name: Verify Deployment
         run: |
