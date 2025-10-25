@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Plus, FileText, Users, Mail, LogOut, Shield, ExternalLink, Settings, Wrench, UserCircle, ClipboardList } from 'lucide-react';
+import { Plus, FileText, Users, Mail, LogOut, Shield, ExternalLink, Settings, Wrench, UserCircle, ClipboardList, Star, MessageCircle } from 'lucide-react';
 import { getProjects } from '../../services/api';
-import type { Project } from '../../types';
+import type { Project, ReviewAnalytics } from '../../types';
+import RatingStars from '../../components/RatingStars';
 
 const Dashboard = () => {
   const { admin, logout, token } = useAuth();
@@ -13,6 +14,15 @@ const Dashboard = () => {
     total: 0,
     residential: 0,
     commercial: 0,
+  });
+  const [reviewStats, setReviewStats] = useState<{
+    averageRating: number | null;
+    total: number;
+    pending: number;
+  }>({
+    averageRating: null,
+    total: 0,
+    pending: 0,
   });
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -60,6 +70,32 @@ const Dashboard = () => {
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+    const fetchReviewAnalytics = async () => {
+      if (!token) return;
+      try {
+        const response = await fetch(`${API_URL}/reviews/analytics`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('Failed to load review analytics');
+
+        const data: ReviewAnalytics = await response.json();
+        setReviewStats({
+          averageRating: data.averageRating,
+          total: data.totals.all,
+          pending: data.counts.pending,
+        });
+      } catch (error) {
+        console.error('Error fetching review analytics:', error);
+      }
+    };
+
+    fetchReviewAnalytics();
+  }, [API_URL, token]);
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -102,7 +138,7 @@ const Dashboard = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -130,6 +166,25 @@ const Dashboard = () => {
                 <p className="text-3xl font-bold">{stats.commercial}</p>
               </div>
               <Mail className="w-12 h-12 text-purple-500" />
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">Pending Reviews</p>
+                <p className="text-3xl font-bold">{reviewStats.pending}</p>
+              </div>
+              <MessageCircle className="w-12 h-12 text-amber-500" />
+            </div>
+            <div className="mt-4">
+              <p className="text-sm text-gray-500 mb-1">Average Rating</p>
+              <div className="flex items-center gap-3">
+                <RatingStars rating={reviewStats.averageRating ?? 0} />
+                <span className="text-sm text-gray-600">
+                  {reviewStats.averageRating !== null ? reviewStats.averageRating.toFixed(1) : 'N/A'} • {reviewStats.total} total
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -201,6 +256,17 @@ const Dashboard = () => {
               <div>
                 <p className="font-medium">Service Requests</p>
                 <p className="text-sm text-gray-600">View and manage service requests</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/admin/reviews"
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <Star className="w-6 h-6 text-gray-600" />
+              <div>
+                <p className="font-medium">Customer Reviews</p>
+                <p className="text-sm text-gray-600">Moderate and feature testimonials</p>
               </div>
             </Link>
           </div>

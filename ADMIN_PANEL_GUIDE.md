@@ -50,6 +50,17 @@
 
 ---
 
+## ⭐ Review Moderation (New)
+
+- Visitors can submit 1–5 star reviews directly from the Services page.
+- New admin route: `/admin/reviews` lists all submissions with filters (status, rating, service, search).
+- Actions available per review: approve, reject, feature/unfeature, edit details, and delete.
+- Analytics card highlights pending count, average rating, and overall totals; also visible on the dashboard.
+- Public API: `POST /api/reviews` (submit), `GET /api/reviews` (approved reviews for display).
+- Admin API: `GET /api/reviews/admin`, `PATCH /api/reviews/:id/status`, `PATCH /api/reviews/:id`, `DELETE /api/reviews/:id`, `GET /api/reviews/analytics`.
+
+---
+
 ## 🚀 Quick Setup
 
 ### 1. Install New Dependencies

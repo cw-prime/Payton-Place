@@ -1,5 +1,12 @@
 import axios from 'axios';
-import type { Project, Service, TeamMember, ContactForm, QuoteForm } from '../types';
+import type {
+  Project,
+  Service,
+  TeamMember,
+  ContactForm,
+  QuoteForm,
+  ReviewsResponse,
+} from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -49,6 +56,32 @@ export const submitContactForm = async (data: ContactForm): Promise<any> => {
 // Quote
 export const submitQuoteRequest = async (data: QuoteForm): Promise<any> => {
   const response = await api.post('/quote', data);
+  return response.data;
+};
+
+// Reviews
+export interface ReviewSubmissionPayload {
+  customerName: string;
+  customerEmail: string;
+  rating: number;
+  title: string;
+  body: string;
+  serviceId?: string;
+  turnstileToken?: string;
+}
+
+export const getReviews = async (params?: {
+  page?: number;
+  limit?: number;
+  featured?: boolean;
+  serviceId?: string;
+}): Promise<ReviewsResponse> => {
+  const response = await api.get('/reviews', { params });
+  return response.data;
+};
+
+export const submitReview = async (data: ReviewSubmissionPayload): Promise<{ message: string; reviewId: string }> => {
+  const response = await api.post('/reviews', data);
   return response.data;
 };
 

@@ -10,6 +10,7 @@ Base URL: `http://localhost:5000/api` (development) or `https://your-domain.com/
 - [Team](#team)
 - [Contact](#contact)
 - [Quote Requests](#quote-requests)
+- [Reviews](#reviews)
 - [Health Check](#health-check)
 
 ## Authentication
@@ -454,3 +455,87 @@ The API accepts requests from the frontend origin specified in the `CORS_ORIGIN`
 ---
 
 For more information, see the main README.md file.
+## Reviews
+
+### Submit a Review
+
+Allow customers to submit a review. Reviews are created with `pending` status and require admin approval before they appear publicly.
+
+**Endpoint:** `POST /api/reviews`
+
+**Body:**
+```json
+{
+  "customerName": "Jordan Smith",
+  "customerEmail": "jordan@example.com",
+  "rating": 5,
+  "title": "Thrilled with the new office build-out",
+  "body": "The team delivered on time and the quality is fantastic.",
+  "serviceId": "654abc123def456789012347",
+  "turnstileToken": "token-from-cloudflare"
+}
+```
+
+**Response:** `201 Created`
+```json
+{
+  "message": "Thank you! Your review has been submitted and is awaiting approval.",
+  "reviewId": "65f1c3b9a857e847b1c4d2f0"
+}
+```
+
+### Get Approved Reviews
+
+Fetch approved reviews for display on the public site.
+
+**Endpoint:** `GET /api/reviews`
+
+**Query Parameters:**
+- `page` (optional): Page number (default `1`)
+- `limit` (optional): Reviews per page (default `10`, max `50`)
+- `featured` (optional): Set to `true` to fetch featured reviews only
+- `serviceId` (optional): Filter reviews by service
+
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    {
+      "_id": "65f1c3b9a857e847b1c4d2f0",
+      "customerName": "Jordan Smith",
+      "customerEmail": "jordan@example.com",
+      "rating": 5,
+      "title": "Thrilled with the new office build-out",
+      "body": "The team delivered on time and the quality is fantastic.",
+      "serviceId": {
+        "_id": "654abc123def456789012347",
+        "name": "Commercial Build-Out"
+      },
+      "featured": true,
+      "status": "approved",
+      "createdAt": "2024-03-14T18:35:27.000Z",
+      "updatedAt": "2024-03-15T09:12:10.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 12,
+    "page": 1,
+    "pages": 2,
+    "limit": 10
+  },
+  "summary": {
+    "averageRating": 4.7,
+    "totalReviews": 12
+  }
+}
+```
+
+### Admin: Review Management
+
+(Protected – requires `Authorization: Bearer <token>`)
+
+- `GET /api/reviews/admin` – List reviews with filters (`status`, `serviceId`, `minRating`, `search`, pagination).
+- `PATCH /api/reviews/:id/status` – Approve, reject, or move a review back to pending.
+- `PATCH /api/reviews/:id` – Edit review details (name, email, rating, title, body, featured flag, associated service, status).
+- `DELETE /api/reviews/:id` – Permanently delete a review.
+- `GET /api/reviews/analytics` – Retrieve counts (pending/approved/rejected), overall submission totals, average rating, per-service breakdown, and latest activity timestamp.

@@ -26,6 +26,7 @@ import TeamList from './pages/admin/TeamList';
 import TeamForm from './pages/admin/TeamForm';
 import TeamEdit from './pages/admin/TeamEdit';
 import ServiceRequestsList from './pages/admin/ServiceRequestsList';
+import ReviewsList from './pages/admin/ReviewsList';
 
 function App() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function App() {
         <Route path="/admin/team/new" element={<TeamForm />} />
         <Route path="/admin/team/:id/edit" element={<TeamEdit />} />
         <Route path="/admin/service-requests" element={<ServiceRequestsList />} />
+        <Route path="/admin/reviews" element={<ReviewsList />} />
       </Routes>
     );
   }

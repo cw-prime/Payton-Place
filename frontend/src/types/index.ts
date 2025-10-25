@@ -100,3 +100,54 @@ export interface ServiceRequest extends ServiceRequestForm {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Review {
+  _id: string;
+  customerName: string;
+  customerEmail: string;
+  rating: number;
+  title: string;
+  body: string;
+  serviceId?: {
+    _id: string;
+    name: string;
+  } | null;
+  status: 'pending' | 'approved' | 'rejected';
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReviewsResponse {
+  data: Review[];
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+    limit: number;
+  };
+  summary: {
+    averageRating: number | null;
+    totalReviews: number;
+  };
+}
+
+export interface ReviewAnalytics {
+  counts: {
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
+  totals: {
+    all: number;
+    approved: number;
+  };
+  averageRating: number | null;
+  serviceBreakdown: Array<{
+    serviceId: string;
+    serviceName: string;
+    averageRating: number;
+    totalReviews: number;
+  }>;
+  latestActivity: string | null;
+}

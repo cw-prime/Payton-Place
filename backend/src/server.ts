@@ -15,6 +15,7 @@ import quoteRoutes from './routes/quoteRoutes';
 import settingsRoutes from './routes/settingsRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import serviceRequestRoutes from './routes/serviceRequestRoutes';
+import reviewRoutes from './routes/reviewRoutes';
 
 const app: Application = express();
 
@@ -45,6 +46,7 @@ app.use('/api/quote', quoteRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/service-requests', serviceRequestRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -69,6 +71,7 @@ app.get('/', (req: Request, res: Response) => {
       quote: '/api/quote',
       categories: '/api/categories',
       serviceRequests: '/api/service-requests',
+      reviews: '/api/reviews',
       health: '/api/health',
     },
   });
