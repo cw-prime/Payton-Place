@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed": "tsx src/scripts/seed.ts",
     "seed-dummy": "tsx src/scripts/seedDummyData.ts",
+    "seed-reviews": "tsx src/scripts/seedReviews.ts",
     "create-admin": "tsx src/scripts/createAdmin.ts"
   },
   "dependencies": {
