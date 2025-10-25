@@ -4,6 +4,7 @@ import { connectDB } from '../config/database';
 import Project from '../models/Project';
 import Service from '../models/Service';
 import TeamMember from '../models/TeamMember';
+import Review from '../models/Review';
 
 dotenv.config();
 
@@ -361,6 +362,49 @@ const teamData = [
   },
 ];
 
+const reviewSeeds = [
+  {
+    customerName: 'Olivia Martin',
+    customerEmail: 'olivia.martin@example.com',
+    rating: 5,
+    title: 'Kitchen remodel perfection',
+    body: 'Payton Place guided us through every decision and the finished kitchen is stunning. The crew was respectful of our home and finished right on schedule.',
+    serviceName: 'Kitchen Remodeling',
+    status: 'approved',
+    featured: true,
+  },
+  {
+    customerName: 'Marcus Lee',
+    customerEmail: 'marcus.lee@example.com',
+    rating: 4,
+    title: 'Office overhaul done right',
+    body: 'We hired the team for an office redesign and productivity has noticeably improved. Communication was great throughout and any issues were solved quickly.',
+    serviceName: 'Office Redesigns',
+    status: 'approved',
+    featured: false,
+  },
+  {
+    customerName: 'Danielle Ruiz',
+    customerEmail: 'danielle.ruiz@example.com',
+    rating: 5,
+    title: 'Bathroom feels like a spa',
+    body: 'From the tile work to the fixtures, every detail in our new bathroom feels luxurious. We appreciated the design suggestions—they made a huge impact.',
+    serviceName: 'Bathroom Renovations',
+    status: 'approved',
+    featured: true,
+  },
+  {
+    customerName: 'Jared Collins',
+    customerEmail: 'jared.collins@example.com',
+    rating: 5,
+    title: 'Seamless commercial addition',
+    body: 'Our warehouse expansion went off without a hitch. The crew worked around our operations and delivered more than we expected.',
+    serviceName: 'Commercial Additions',
+    status: 'approved',
+    featured: false,
+  },
+];
+
 const seedDatabase = async () => {
   try {
     console.log('🌱 Starting database seed...');
@@ -373,6 +417,7 @@ const seedDatabase = async () => {
     await Project.deleteMany({});
     await Service.deleteMany({});
     await TeamMember.deleteMany({});
+    await Review.deleteMany({});
 
     // Insert new data
     console.log('📝 Inserting projects...');
@@ -386,6 +431,24 @@ const seedDatabase = async () => {
     console.log('📝 Inserting team members...');
     await TeamMember.insertMany(teamData);
     console.log(`✅ ${teamData.length} team members created`);
+
+    console.log('📝 Inserting reviews...');
+    const services = await Service.find({});
+    const serviceMap = new Map(services.map(service => [service.name, service._id]));
+
+    const reviewsToInsert = reviewSeeds.map((review) => ({
+      customerName: review.customerName,
+      customerEmail: review.customerEmail,
+      rating: review.rating,
+      title: review.title,
+      body: review.body,
+      serviceId: serviceMap.get(review.serviceName) || undefined,
+      status: review.status,
+      featured: review.featured,
+    }));
+
+    await Review.insertMany(reviewsToInsert);
+    console.log(`✅ ${reviewsToInsert.length} reviews created`);
 
     console.log('🎉 Database seeded successfully!');
     process.exit(0);

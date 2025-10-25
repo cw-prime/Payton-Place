@@ -73,13 +73,15 @@ const ServicesList = () => {
               Back to Dashboard
             </button>
             <div className="flex items-center gap-3">
-              <Link
-                to="/"
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
                 View Site
-              </Link>
+              </a>
               <button
                 onClick={logout}
                 className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"

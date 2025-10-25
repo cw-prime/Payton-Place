@@ -6,9 +6,10 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import TextArea from '../../components/TextArea';
 import Select from '../../components/Select';
+import TagsInput from '../../components/TagsInput';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getProjectById } from '../../services/api';
-import type { Project } from '../../types';
+import type { Project, Category } from '../../types';
 
 const ProjectEdit = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,12 +19,13 @@ const ProjectEdit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [project, setProject] = useState<Project | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'residential' as 'residential' | 'commercial',
+    category: '',
     type: '',
     location: '',
     duration: '',
@@ -34,6 +36,7 @@ const ProjectEdit = () => {
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
   const API_BASE_URL = API_URL.replace('/api', '');
@@ -47,7 +50,20 @@ const ProjectEdit = () => {
 
   useEffect(() => {
     fetchProject();
+    fetchCategories();
   }, [id]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories?type=project&active=true`);
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProject = async () => {
     try {
@@ -64,6 +80,7 @@ const ProjectEdit = () => {
         budget: data.details?.budget || '',
         featured: data.featured,
       });
+      setTags(data.tags || []);
     } catch (error) {
       console.error('Error fetching project:', error);
       setError('Failed to load project');
@@ -151,6 +168,11 @@ const ProjectEdit = () => {
       if (formData.duration) formDataToSend.append('details[duration]', formData.duration);
       if (formData.budget) formDataToSend.append('details[budget]', formData.budget);
 
+      // Add tags
+      tags.forEach((tag) => {
+        formDataToSend.append('tags', tag);
+      });
+
       // Send existing images (that weren't marked for deletion)
       existingImages.forEach((imageUrl) => {
         formDataToSend.append('existingImages[]', imageUrl);
@@ -185,10 +207,12 @@ const ProjectEdit = () => {
     }
   };
 
-  const categoryOptions = [
-    { value: 'residential', label: 'Residential' },
-    { value: 'commercial', label: 'Commercial' },
-  ];
+  const categoryOptions = categories.length > 0
+    ? categories.map(cat => ({
+        value: cat.slug,
+        label: cat.name,
+      }))
+    : [{ value: '', label: 'Loading categories...' }];
 
   if (loading) {
     return (
@@ -393,7 +417,7 @@ const ProjectEdit = () => {
             <Select
               label="Category *"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as 'residential' | 'commercial' })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               options={categoryOptions}
               required
             />
@@ -421,6 +445,13 @@ const ProjectEdit = () => {
               label="Budget Range"
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+            />
+
+            <TagsInput
+              label="Tags"
+              value={tags}
+              onChange={setTags}
+              placeholder="e.g., renovation, modern, luxury"
             />
 
             <div className="flex items-center gap-2">

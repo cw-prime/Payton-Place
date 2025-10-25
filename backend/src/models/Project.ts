@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IProject extends Document {
   title: string;
   description: string;
-  category: 'residential' | 'commercial';
+  category: string;
   type: string;
   images: string[];
   featured: boolean;
@@ -20,6 +20,11 @@ export interface IProject extends Document {
     role: string;
   };
   tags: string[];
+  beforeAfterGallery?: Array<{
+    beforeImage: string;
+    afterImage: string;
+    description?: string;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,7 +42,6 @@ const ProjectSchema = new Schema<IProject>(
     },
     category: {
       type: String,
-      enum: ['residential', 'commercial'],
       required: true,
     },
     type: {
@@ -65,6 +69,11 @@ const ProjectSchema = new Schema<IProject>(
       role: String,
     },
     tags: [String],
+    beforeAfterGallery: [{
+      beforeImage: String,
+      afterImage: String,
+      description: String,
+    }],
   },
   {
     timestamps: true,

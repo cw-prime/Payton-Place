@@ -2,6 +2,11 @@
 
 A full-stack real estate consulting web application with a smooth-scrolling, image-rich UI and functional backend. Built with modern technologies and designed for easy customization and deployment.
 
+## 🌍 Environments
+
+- **Sandbox/Testing**: https://payton-place.mbartonportfolio.space (Client demo and testing environment)
+- **Production**: TBD (Final production deployment)
+
 ![Payton Place Development](./screen.png)
 
 ## 🌟 Features

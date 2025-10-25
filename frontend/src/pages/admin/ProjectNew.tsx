@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ArrowLeft, Upload, X } from 'lucide-react';
@@ -6,6 +6,8 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import TextArea from '../../components/TextArea';
 import Select from '../../components/Select';
+import TagsInput from '../../components/TagsInput';
+import type { Category } from '../../types';
 
 const ProjectNew = () => {
   const { token, logout } = useAuth();
@@ -13,11 +15,12 @@ const ProjectNew = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'residential',
+    category: '',
     type: '',
     location: '',
     duration: '',
@@ -27,6 +30,7 @@ const ProjectNew = () => {
 
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -49,6 +53,27 @@ const ProjectNew = () => {
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_URL}/categories?type=project&active=true`);
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+          // Set first category as default if available
+          if (data.length > 0 && !formData.category) {
+            setFormData(prev => ({ ...prev, category: data[0].slug }));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -68,6 +93,11 @@ const ProjectNew = () => {
       if (formData.location) formDataToSend.append('details[location]', formData.location);
       if (formData.duration) formDataToSend.append('details[duration]', formData.duration);
       if (formData.budget) formDataToSend.append('details[budget]', formData.budget);
+
+      // Add tags
+      tags.forEach((tag) => {
+        formDataToSend.append('tags', tag);
+      });
 
       // Add images
       images.forEach((image) => {
@@ -98,10 +128,12 @@ const ProjectNew = () => {
     }
   };
 
-  const categoryOptions = [
-    { value: 'residential', label: 'Residential' },
-    { value: 'commercial', label: 'Commercial' },
-  ];
+  const categoryOptions = categories.length > 0
+    ? categories.map(cat => ({
+        value: cat.slug,
+        label: cat.name,
+      }))
+    : [{ value: '', label: 'Loading categories...' }];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -211,7 +243,7 @@ const ProjectNew = () => {
             <Select
               label="Category *"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as 'residential' | 'commercial' })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               options={categoryOptions}
               required
             />
@@ -243,6 +275,13 @@ const ProjectNew = () => {
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
               placeholder="e.g., $50,000 - $75,000"
+            />
+
+            <TagsInput
+              label="Tags"
+              value={tags}
+              onChange={setTags}
+              placeholder="e.g., renovation, modern, luxury"
             />
 
             <div className="flex items-center gap-2">
