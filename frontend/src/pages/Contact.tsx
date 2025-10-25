@@ -9,8 +9,8 @@ import Input from '../components/Input';
 import TextArea from '../components/TextArea';
 import Select from '../components/Select';
 import Button from '../components/Button';
-import Turnstile from '../components/Turnstile';
 import { submitContactForm } from '../services/api';
+import type { ContactForm } from '../types';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -24,7 +24,6 @@ type ContactFormData = z.infer<typeof contactSchema>;
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   const {
     register,
@@ -36,19 +35,12 @@ const Contact = () => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    if (!turnstileToken) {
-      setSubmitStatus('error');
-      console.error('Turnstile verification required');
-      return;
-    }
-
     try {
       setIsSubmitting(true);
       setSubmitStatus('idle');
-      await submitContactForm({ ...data, turnstileToken } as any);
+      await submitContactForm(data as ContactForm);
       setSubmitStatus('success');
       reset();
-      setTurnstileToken('');
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       setSubmitStatus('error');
@@ -102,14 +94,9 @@ const Contact = () => {
               error={errors.projectType?.message}
             />
 
-            <Turnstile
-              onVerify={setTurnstileToken}
-              onError={() => setTurnstileToken('')}
-            />
-
             <Button
               type="submit"
-              disabled={isSubmitting || !turnstileToken}
+              disabled={isSubmitting}
               fullWidth
               className="!py-4"
             >
@@ -146,11 +133,24 @@ const Contact = () => {
 
           {/* Map */}
           <div className="rounded-lg overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200"
-              alt="Location map"
-              className="w-full h-96 object-cover"
+            <iframe
+              title="Service area map highlighting St. Louis and the surrounding metro region"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-90.5992%2C38.4821%2C-89.7989%2C38.7945&amp;layer=mapnik&amp;marker=38.6270%2C-90.1994"
+              className="w-full h-96 border-0"
+              loading="lazy"
+              allowFullScreen
             />
+            <p className="mt-2 text-sm text-gray-500">
+              Serving the Greater St. Louis metro area.{' '}
+              <a
+                href="https://www.openstreetmap.org/?mlat=38.6270&amp;mlon=-90.1994#map=11/38.6270/-90.1994"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                View larger map
+              </a>
+            </p>
           </div>
         </div>
       </AnimatedSection>
